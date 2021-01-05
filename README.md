@@ -2,21 +2,20 @@
 
 ## Introduction 
 
-The idea of the project was to implement (with transfer learning and some retraining) different face recognition loss functions on a pretrained network architecture, test their performance and show their particulatrites. The pictures used for (re)training the models is a subset of the [Labelled Face in the Wild Dataset](http://vis-www.cs.umass.edu/lfw/).
+The first part of the project consist in implementing (with transfer learning and some retraining) different face recognition loss functions on a pretrained network architecture. The idea was also to show the particularities of their embeddings representations.  
 
-In a second time,  we use pretrained Facenet embeding (as ours were not enough powerful) as inputs to do an open set face recognition task the dataset used is a small personnal celebrity dataset (**all links to download are below**).
+In the second part of the project,  we used a pretrained Facenet face embedding (as ours were not enough powerful) as inputs to do an open set face recognition task.
 
-## Summary of the tasks done
-1) Face detection and image cropping of the entire dataset
-2) Training and benchmark of three algorithm loss for face embedding (SphereFace, CenterLoss and Triplet loss)
-3) Test a pretrained face embedding for a open set face recognition problem on a the celebrity dataset.
+The pictures used for the first part comes from the [Labelled Face in the Wild Dataset](http://vis-www.cs.umass.edu/lfw/). 
+The dataset used is a small personnalized celebrity dataset.
+You can find all the data at this [link](https://drive.google.com/drive/folders/13ySIhIpwhYiprQblIZNIuUms9-mD3LoH?usp=sharing)
 
 ## How to use this repo
 1) **Clone the repo** :
 `git clone `
 2) Download the data with this [link](https://drive.google.com/drive/folders/13ySIhIpwhYiprQblIZNIuUms9-mD3LoH?usp=sharing)
     -Copy the data folder in the root of this repo
-3) Run the notebook you want (as the two are independant)
+3) Run the notebook you want (as the two are independent)
 
 ## Useful definitions of face recognitions problems
 **Face verification :** 
@@ -29,30 +28,30 @@ A face recognition problem consist in checking if the input image corresponds to
 Open-set classification is a problem of handling unknown classes that are not contained in the training dataset, whereas traditional classifiers assume that only known classes appear in the test environment.
 
 **One shot learning problem :**
-*One-shot learning is an object categorization problem, found mostly in computer vision. Whereas most machine learning based object categorization algorithms require training on hundreds or thousands of samples/images and very large datasets, one-shot learning aims to learn information about object categories from one, or only a few, training samples/images.* ([Wikipedia](https://en.wikipedia.org/wiki/One-shot_learning))
+One-shot learning is an object categorization problem, found mostly in computer vision. Whereas most machine learning based object categorization algorithms require training on hundreds or thousands of samples/images and very large datasets, one-shot learning aims to learn information about object categories from one, or only a few, training samples/images.
 
 ## Main approach for face recognition problems :
-Most of the face recognition use cases are open set problems, we cannot train a neural network to solve the problem. Also it can be assimilated as one shot learning problems in the sense it often uses only few training examples to classify the new ones. 
 
-The main appraoch to solve those challenges, is to first learn *face embedings* one a closed set of identities. Then we can use those vectorial/hidden representations to compute similiraty between faces as *a face verification* problem : if the similarity between to faces is strong we can infer than the two faces are the same. To finish this approach can be extended to a  *open set classification problem* by taking the greater similarity among a different identities.
+Most of the face recognition use cases are open set problems. It can also be assimilated to one shot learning problems in the sense it often we have only few training examples to classify an identity. In this context, it can be difficult to specialize a neural network on each specific face recognition problems.
+
+The main appraoch to solve those challenges consist in first learn *face embedings* one a closed set of identities on a large dataset and then use those vectorial/hidden representations to specific face verification or recognition task. For example it is possible to execute a face verification task between two faces just by examinate similarity of their two vectorial representation. 
+
+It exists several networks and loss function to learn those embeddings. We decided in the first part to implement and train three of them. 
 
 ## Part 1 :  loss comparison for face embedding
 
 In this first part, we tried to fit three different losses found in the litterature to learn face embeddings on a subset of LFW dataset. You can find our work in the **Part 1** notebook.
 
-### Pipeline for data transformation
-
-Before to present theoritically the losses used, here it is  the pipeline we did to do the training part : 
+### Pipeline for the data preparation
+Our pipeline for data transformation is the following 
 1) Face cropping using an [haar cascade classifier](https://towardsdatascience.com/computer-vision-detecting-objects-using-haar-cascade-classifier-4585472829a9) 
 2) Image resizing to be fed into the network
 3) Image normalizing. To do so we substracted every pixels by 128 and divided them 127.5 as done in a lot of litterature protocols (eg . [this paper](https://arxiv.org/pdf/1704.08063.pdf) )
 
-To enhance this pipeline we should have done face alignement and image augmentation (rotations, deformation, adding noise ...).
-
 ### Loss presentation
-We implemented, above a pre trainded Mobile net architecture those three losses and trained the models.
+We implemented the three following losses above a pre trainded MobileNet architecture.
 
-#### Triplet loss
+#### 1) The Triplet loss
 Let A the hidden representation of a face, P the hidden representation of another face with the same identity and N the hidden representation of a face with another identity.
 The triplet loss aim to minimize : 
 ![triplet](images/triplet.PNG)
@@ -61,7 +60,7 @@ Where alpha is a margin parameter (the highest it is the more loss is "permissiv
 
 The problem with this loss is the triplet generation : it is costly and difficult to choose triplets of image adequatly.
 
-#### Center loss
+#### 2) The Center loss
 Based on this [paper](https://ydwen.github.io/papers/WenECCV16.pdf) and helped from this [repo](https://github.com/handongfeng/MNIST-center-loss), we implemented the center face loss to learn embeddings on our dataset.
 
 The center loss is defiend as the following :
@@ -73,7 +72,7 @@ Where
  - lambda is the tradeoff parameter between the softmax loss and the variance of the hidden representations
 
 
-#### Sphere Face loss
+#### 3) The Sphere Face loss
 Based on this [paper](https://arxiv.org/pdf/1801.07698.pdf) and helped from this [repo](https://github.com/4uiiurz1/keras-arcface), we implemented the sphere face loss to learn embeddings on our dataset.
 
 The sphere face loss is slightly [A-softmax loss function](https://towardsdatascience.com/additive-margin-softmax-loss-am-softmax-912e11ce1c6b) described as the following : 
