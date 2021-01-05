@@ -55,7 +55,7 @@ We implemented, above a pre trainded Mobile net architecture those three losses 
 #### Triplet loss
 Let A the hidden representation of a face, P the hidden representation of another face with the same identity and N the hidden representation of a face with another identity.
 The triplet loss aim to minimize : 
-$${\displaystyle {\mathcal {L}}\left(A,P,N\right)=\operatorname {max} \left({\|\operatorname {f} \left(A\right)-\operatorname {f} \left(P\right)\|}^{2}-{\|\operatorname {f} \left(A\right)-\operatorname {f} \left(N\right)\|}^{2}+\alpha ,0\right)}$$
+![triplet](images/triplet.png)
 Where $$\alpha$$ is a margin parameter (the highest it is the more loss is "permissive"). The idea of this loss function is to pass three examples through the neural network and (an Anchor a Postive and a Negative) instead of one to try to separate as much as possible the hidden representations of the different identities.
 
 #### Center loss
@@ -84,7 +84,6 @@ We did not understand all the geometric specifities of this loss, however it see
 
 ### Results
 We trained for 25 epochs two versions of each network/loss (changing the losses hyperparameters). Our embeding size is of 256 neurons. We tried to vizualize our representations with a TSNE algorithm. You can find all the losses and embeding graphs in the **Part1 Notebook** (we just put the main here). To sum up, none of our networks achieved to good results (in term of accuracy or embedings).
-
 
 
 ### Possible explanations of the "poor" results
