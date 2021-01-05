@@ -4,7 +4,7 @@
 
 The idea of the project was to implement (with transfer learning and some retraining) different face recognition loss functions on a pretrained network architecture, test their performance and show their particulatrites. The pictures used for (re)training the models is a subset of the [Labelled Face in the Wild Dataset](http://vis-www.cs.umass.edu/lfw/).
 
-In a second time,  we use pretrained Facenet embeding (as ours were not enough powerful) as inputs to do an open set face recognition task the dataset used is a small celebrity dataset [download].
+In a second time,  we use pretrained Facenet embeding (as ours were not enough powerful) as inputs to do an open set face recognition task the dataset used is a small personnal celebrity dataset (**all links to download are below**).
 
 ## Summary of the tasks done
 1) Face detection and image cropping of the entire dataset
