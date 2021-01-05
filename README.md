@@ -14,16 +14,16 @@ In a second time,  we use pretrained Facenet embeding (as ours were not enough p
 ## How to use this repo
 1) **Clone the repo** :
 `git clone `
-2) Download the data and the pretrained architectures 
-    - Put  the data in the  data folder
-    - Put the models in the model folder
+2) Download the data with this [link](https://drive.google.com/drive/folders/13ySIhIpwhYiprQblIZNIuUms9-mD3LoH?usp=sharing)
+    -Copy the data folder in the root of this repo
 3) Run the notebook you want (as the two are independant)
+
 ## Useful definitions of face recognitions problems
 **Face verification :** 
-A face verification problem consist in checking if two input images are the same person or not  
+A face verification problem consist in checking if two input images are the same person or not.  
 
 **Face recognition :**
-A face recognition problem consist in checking if the input image corresponds to one of the person in database. It can be done, for example, running multiple face verifications between the input image and the entire dataset. This method can be assimilated to _one shot learning_   
+A face recognition problem consist in checking if the input image corresponds to one of the person in database. It can be done, for example, running multiple face verifications between the input image and the entire dataset. This method can be assimilated to _one shot learning_ .  
 
 **Open set problem :** 
 Open-set classification is a problem of handling unknown classes that are not contained in the training dataset, whereas traditional classifiers assume that only known classes appear in the test environment.
@@ -47,12 +47,13 @@ Before to present theoritically the losses used, here it is  the pipeline we did
 2) Image resizing to be fed into the network
 3) Image normalizing. To do so we substracted every pixels by 128 and divided them 127.5 as done in a lot of litterature protocols (eg . [this paper](https://arxiv.org/pdf/1704.08063.pdf) )
 
-To enhance this  pipeline we should have done face alignement and image augmentation (rotations, deformation, add noise ...).
+To enhance this pipeline we should have done face alignement and image augmentation (rotations, deformation, adding noise ...).
 
 ### Loss presentation
 We implemented, above a pre trainded Mobile net architecture those three losses and trained the models.
+
 #### Triplet loss
-Let A the hidden representation of a face, P the hidden representation of a face with the same identity and N the hidden representation of a face with another identity.
+Let A the hidden representation of a face, P the hidden representation of another face with the same identity and N the hidden representation of a face with another identity.
 The triplet loss aim to minimize : 
 $${\displaystyle {\mathcal {L}}\left(A,P,N\right)=\operatorname {max} \left({\|\operatorname {f} \left(A\right)-\operatorname {f} \left(P\right)\|}^{2}-{\|\operatorname {f} \left(A\right)-\operatorname {f} \left(N\right)\|}^{2}+\alpha ,0\right)}$$
 Where $$\alpha$$ is a margin parameter (the highest it is the more loss is "permissive"). The idea of this loss function is to pass three examples through the neural network and (an Anchor a Postive and a Negative) instead of one to try to separate as much as possible the hidden representations of the different identities.
@@ -65,8 +66,8 @@ The center loss is defiend as the following :
 $$L = L_S + \lambda L_C = \frac{1}{N}\sum^{N}_{i =1} log \frac{e^{W^{T}_{y_i}x_i + b_{y_i}}}{\sum_{j=1}^{p}e^{W^{T}_{j}x_i + b_{j}}} + \lambda \sum^{N}_{i =1}|| x_i - c_{y_i}||^2_2$$
 
 Where
- - $$c_{y_i}$$ denotes the yith class center of deep features.
- - $$\lambda$$ is the tradeoff parameter between the softmax loss and the variance of the hidden represnetations
+ - c_{y_i} denotes the yith class center of deep features.
+ - lambda$ is the tradeoff parameter between the softmax loss and the variance of the hidden represnetations
 
 
 #### Sphere Face loss
@@ -75,14 +76,16 @@ Based on this [paper](https://arxiv.org/pdf/1801.07698.pdf) and helped from this
 The sphere face loss is slightly [A-softmax loss function](https://towardsdatascience.com/additive-margin-softmax-loss-am-softmax-912e11ce1c6b) described as the following : 
 L = $$\frac{1}{N}\sum^{N}_{i =1} log \frac{e^{s(cos(m\theta_{y_i})}}{e^{s(cos(m\theta_{y_i}))} + \sum_{j=1, j \neq y_i} e^{s(cos(m\theta_{j})}}$$
 Where
- - $$\theta_{j}$$ represents the angle between $$W_j$$ (weights of the previous layer) and the feature $$x_i$$
+ - \theta_{j} represents the angle between W_j (weights of the previous layer) and the feature x_i
  - m is a multiplicative margin  penality
  - s is scale penality 
 
-We did not understand all the geometric specifities of this loss, however it seems to force the network to separate as much as possible the embedding of different classes.
+We did not understand all the geometric specifities of this loss, however it seems to push the network to separate as much as possible the embedding of different classes.
 
 ### Results
-We trained for 25 epochs two versions of each network/loss (changing the losses hyperparameters). Our embeding size is of 256 neurons. We tried to vizualize our representations with a TSNE algorithm. You can find all the losses and embeding graphs in the **Part1 Notebook**. To sum up, none of our networks achieved to good results (in term of accuracy or embedings).
+We trained for 25 epochs two versions of each network/loss (changing the losses hyperparameters). Our embeding size is of 256 neurons. We tried to vizualize our representations with a TSNE algorithm. You can find all the losses and embeding graphs in the **Part1 Notebook** (we just put the main here). To sum up, none of our networks achieved to good results (in term of accuracy or embedings).
+
+
 
 ### Possible explanations of the "poor" results
 Many things could have been enhanced to have best results.
