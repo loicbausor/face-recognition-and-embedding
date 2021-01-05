@@ -12,7 +12,7 @@ You can find all the data at this [link](https://drive.google.com/drive/folders/
 
 ## How to use this repo
 1) **Clone the repo** :
-`git clone `
+`git clone https://github.com/loicbausor/face-recogntion-and-embedding.git`
 2) Download the data with this [link](https://drive.google.com/drive/folders/13ySIhIpwhYiprQblIZNIuUms9-mD3LoH?usp=sharing)
     -Copy the data folder in the root of this repo
 3) Run the notebook you want (as the two are independent)
