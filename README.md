@@ -1,4 +1,4 @@
-# Benchmarking deep face recognition algorithm for one shot learning usage.
+# Face embedding algorithms and open set face recognition 
 
 ## Introduction 
 
@@ -40,7 +40,7 @@ The main appraoch to solve those challenges, is to first learn *face embedings* 
 
 In this first part, we tried to fit three different losses found in the litterature to learn face embeddings on a subset of LFW dataset. You can find our work in the **Part 1** notebook.
 
-### Pipeline for training features
+### Pipeline for data transformation
 
 Before to present theoritically the losses used, here it is  the pipeline we did to do the training part : 
 1) Face cropping using an [haar cascade classifier](https://towardsdatascience.com/computer-vision-detecting-objects-using-haar-cascade-classifier-4585472829a9) 
@@ -55,26 +55,31 @@ We implemented, above a pre trainded Mobile net architecture those three losses 
 #### Triplet loss
 Let A the hidden representation of a face, P the hidden representation of another face with the same identity and N the hidden representation of a face with another identity.
 The triplet loss aim to minimize : 
-![triplet](images/triplet.png)
-Where $$\alpha$$ is a margin parameter (the highest it is the more loss is "permissive"). The idea of this loss function is to pass three examples through the neural network and (an Anchor a Postive and a Negative) instead of one to try to separate as much as possible the hidden representations of the different identities.
+![triplet](images/triplet.PNG)
+
+Where alpha is a margin parameter (the highest it is the more loss is "permissive"). The idea of this loss function is to pass three examples through the neural network and (an Anchor a Postive and a Negative) instead of one to try to separate as much as possible the hidden representations of the different identities.
+
+The problem with this loss is the triplet generation : it is costly and difficult to choose triplets of image adequatly.
 
 #### Center loss
 Based on this [paper](https://ydwen.github.io/papers/WenECCV16.pdf) and helped from this [repo](https://github.com/handongfeng/MNIST-center-loss), we implemented the center face loss to learn embeddings on our dataset.
 
 The center loss is defiend as the following :
 
-$$L = L_S + \lambda L_C = \frac{1}{N}\sum^{N}_{i =1} log \frac{e^{W^{T}_{y_i}x_i + b_{y_i}}}{\sum_{j=1}^{p}e^{W^{T}_{j}x_i + b_{j}}} + \lambda \sum^{N}_{i =1}|| x_i - c_{y_i}||^2_2$$
+![center](images/center.PNG)
 
 Where
  - c_{y_i} denotes the yith class center of deep features.
- - lambda$ is the tradeoff parameter between the softmax loss and the variance of the hidden represnetations
+ - lambda is the tradeoff parameter between the softmax loss and the variance of the hidden representations
 
 
 #### Sphere Face loss
 Based on this [paper](https://arxiv.org/pdf/1801.07698.pdf) and helped from this [repo](https://github.com/4uiiurz1/keras-arcface), we implemented the sphere face loss to learn embeddings on our dataset.
 
 The sphere face loss is slightly [A-softmax loss function](https://towardsdatascience.com/additive-margin-softmax-loss-am-softmax-912e11ce1c6b) described as the following : 
-L = $$\frac{1}{N}\sum^{N}_{i =1} log \frac{e^{s(cos(m\theta_{y_i})}}{e^{s(cos(m\theta_{y_i}))} + \sum_{j=1, j \neq y_i} e^{s(cos(m\theta_{j})}}$$
+
+![sphere](images/sphere.PNG)
+
 Where
  - \theta_{j} represents the angle between W_j (weights of the previous layer) and the feature x_i
  - m is a multiplicative margin  penality
@@ -83,7 +88,37 @@ Where
 We did not understand all the geometric specifities of this loss, however it seems to push the network to separate as much as possible the embedding of different classes.
 
 ### Results
-We trained for 25 epochs two versions of each network/loss (changing the losses hyperparameters). Our embeding size is of 256 neurons. We tried to vizualize our representations with a TSNE algorithm. You can find all the losses and embeding graphs in the **Part1 Notebook** (we just put the main here). To sum up, none of our networks achieved to good results (in term of accuracy or embedings).
+We trained for 25 epochs two versions of each network/loss (changing the losses hyperparameters). Our embeding size is of 256 neurons. We tried to vizualize our representations with a TSNE algorithm. You can find all the losses and embedding graphs below. You can find more interpretations and plot in the **Part1 Notebook** but, to sum up, none of our networks did not achieved good results (in term of accuracy or embeddings).
+
+#### "Triplet networks"
+
+"Triplet networks" loss :
+
+![center](images/triplet_loss.PNG)
+
+"Triplet networks" embedding:
+
+![center](images/triplet_emb.PNG)
+
+#### "Center networks" 
+
+"Center networks" loss : 
+
+![center](images/center_loss.PNG)
+
+"Center networks" embedding:
+
+![center](images/center_emb.PNG)
+
+#### "Sphere networks" 
+
+"Sphere networks" loss : 
+
+![center](images/sphere_loss.PNG)
+
+"Sphere networks" embedding:
+
+![center](images/sphere_emb.PNG)
 
 
 ### Possible explanations of the "poor" results
@@ -102,13 +137,31 @@ Many things could have been enhanced to have best results.
 
 ## Part 2 : Open set recognition with a pretrained facenet model
 
-For this part, we used the celebrity dataset present in the repo. It is composed of pictures of 5 celibrities and a bunch a of pictures of unidentified people.
+For this part, we used a personnalized celebrity dataset. It is composed of pictures of 5 celibrities and a bunch a of pictures of unidentified people.
 
 The idea is to take a little set of pictures of each celebrities (1,2,3 or 4) as an identification set (which can be assimilated to training set) and try to see if we can classify the identity of the other pictures based on this small sample.
 
-To do so we use we embed each face using a pre trained model and try to see measure cosine similarity between the embedings of the test set and the one of the identification set. If the similarity is below a certain threshold we can consider that the picture have the same identity. If no pictures have came below the threshold we consider that the person is unknown.
+To do so we use we embed each face using a pre trained Facenet model and try to  measure cosine similarity between the embedings of the test set and the one of the identification set. If the similarity is below a certain threshold we can consider that the picture have the same identity. If no pictures have came below the threshold we consider that the person is unknown.
 
-Playing with the threshold hyper parameter and the number of pictures by identities in the identification set we achieve an accurracy arrond 98% for 4 pictures by identities. For only one picture by identity, we obtain almost 90% accuracy. You can find all the protocol, confusions matrix and results in the **Part2 Notebook**.
+### Pipeline for data transformation
+
+1) Face cropping using an MTCNN algorithm (as the haar cascade did not give very good results on the part one) 
+2) Image resizing to be fed into the pre trained network
+3) Image normalizing.
+
+### Results : 
+
+Playing with the threshold hyper parameter and the number of pictures by identities in the identification set we achieved really good results in term of accuracy and confusion matrix.
+
+![center](images/P2_1.PNG)
+![center](images/P2_2.PNG)
+
+
+We did some "negative mining" on the missclassified  images, the erros was mainly due to bad face cropping or low resolution.
+
+![center](images/P2_3.PNG)
+
+You can find all the protocol and plot in the **Part2 Notebook**.
 
 
 
